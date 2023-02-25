@@ -1,49 +1,66 @@
-const electricityUserData = {
-  readings: 95,
-  units: 'kWt',
-  mode: 'double',
+type Amount = 'empty' | number;
+type InStock = 'empty' | boolean;
+
+interface ClothesWarehouse {
+  jackets: Amount;
+  hats: Amount;
+  socks: Amount;
+  pants: Amount;
+}
+
+interface StationeryWarehouse {
+  scissors: Amount;
+  paper: InStock;
+}
+
+interface AppliancesWarehouse {
+  dishwashers: Amount;
+  cookers: Amount;
+  mixers: Amount;
+}
+
+interface TotalWarehouse
+  extends ClothesWarehouse,
+    StationeryWarehouse,
+    AppliancesWarehouse {
+  deficit: boolean;
+  date: Date;
+}
+
+const totalData: TotalWarehouse = {
+  jackets: 5,
+  hats: 'empty',
+  socks: 'empty',
+  pants: 15,
+  scissors: 15,
+  paper: true,
+  dishwashers: 3,
+  cookers: 'empty',
+  mixers: 14,
+  deficit: true,
+  date: new Date(),
 };
 
-const waterUserData = {
-  readings: 3,
-  units: 'm3',
-};
+// Реализуйте функцию, которая принимает в себя главный объект totalData нужного формата
+// и возвращает всегда строку
+// Функция должна отфильтровать данные из объекта и оставить только те названия товаров, у которых значение "empty"
+// и поместить их в эту строку. Если таких товаров нет - возвращается другая строка (см ниже)
 
-const elRate: number = 0.45;
-const wRate: number = 2;
+// С данным объектом totalData строка будет выглядеть:
+// "We need this items: hats, socks, cookers"
+// Товары через запятую, в конце её не должно быть. Пробел после двоеточия, в конце строки его нет.
 
-const monthPayments: number[] = [0, 0]; // [electricity, water]
+function printReport(data: TotalWarehouse): string {
+  const emptyPositions: string = Object.entries(data)
+    .reduce(
+      (acc, [key, value]) => (value === 'empty' ? acc + ` ${key},` : acc),
+      ''
+    )
+    .slice(0, -1);
 
-const calculatePayments = (
-  { mode, readings }: { mode: string; readings: number },
-  { readings: wData }: { readings: number },
-  elRate: number,
-  wRate: number
-): void => {
-  if (mode === 'double' && readings < 50) {
-    monthPayments[0] = readings * elRate * 0.7;
-  } else {
-    monthPayments[0] = readings * elRate;
-  }
+  return emptyPositions === ''
+    ? 'Everything fine'
+    : `We need this items:${emptyPositions}`;
+}
 
-  monthPayments[1] = wData * wRate;
-};
-
-calculatePayments(electricityUserData, waterUserData, elRate, wRate);
-
-const sendInvoice = (
-  [electricity, water]: number[],
-  { readings: eReadings, units: eUnits }: { readings: number; units: string },
-  { readings: wReadings, units: wUnits }: { readings: number; units: string }
-): string => {
-  const text: string = `    Hello!
-    This month you used ${eReadings} ${eUnits} of electricity
-    It will cost: ${electricity}€
-    
-    This month you used ${wReadings} ${wUnits} of water
-    It will cost: ${water}€`;
-
-  return text;
-};
-
-console.log(sendInvoice(monthPayments, electricityUserData, waterUserData));
+console.log(printReport(totalData));
