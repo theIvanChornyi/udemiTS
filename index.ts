@@ -1,71 +1,48 @@
-enum TypesOfMedia {
-  VIDEO = 'video',
-  AUDIO = 'audio',
-}
-enum FormatsOfMedia {
-  MP4 = '.mp4',
-  MOV = '.mov',
-  MKV = '.mkv',
-  FLV = '.flv',
-  WEBM = '.webM',
+type Animal = 'cat' | 'dog' | 'bird';
+
+enum Status {
+  Avalible = 'available',
+  NoAvalible = 'not available',
 }
 
-interface IplayMedia {
-  name: string;
-  type: TypesOfMedia;
-  format: FormatsOfMedia;
-  subtitles?: string;
-  marks?: unknown;
+interface IAnimal {
+  animal: Animal;
+  breed: string;
+  sterilized?: boolean;
 }
 
-function playMedia(
-  { name, type, format, subtitles, marks }: IplayMedia = {
-    name: 'example',
-    type: TypesOfMedia.AUDIO,
-    format: FormatsOfMedia.MKV,
-  }
-): string {
-  let marksLog: string;
-  if (Array.isArray(marks)) {
-    marksLog = marks.toString();
-  } else if (typeof marks === 'string') {
-    marksLog = marks;
+interface ISuccesData extends IAnimal {
+  location: string;
+  age?: number;
+}
+
+interface ISuccesRes {
+  status: Status.Avalible;
+  data: ISuccesData;
+}
+
+interface IRejectRes {
+  status: Status.NoAvalible;
+  data: {
+    message: string;
+    nextUpdateIn: Date;
+  };
+}
+
+type Res = ISuccesRes | IRejectRes;
+
+function isAvalible(res: Res): res is ISuccesRes {
+  if (res.status === Status.Avalible) {
+    return true;
   } else {
-    marksLog = 'Unsupported type of marks';
+    return false;
   }
-
-  console.log(`Media ${name}${format} is ${type}
-    Marks: ${marksLog}
-    Subtitles: ${subtitles ?? 'none'}`);
-
-  return 'Media started';
 }
 
-playMedia({
-  name: 'WoW',
-  format: FormatsOfMedia.MKV,
-  type: TypesOfMedia.AUDIO,
-  subtitles: 'hmhmhm hmhmhm doh',
-  marks: ['4:30', '5:40'],
-});
-
-playMedia({
-  name: 'WoW',
-  format: FormatsOfMedia.MKV,
-  type: TypesOfMedia.AUDIO,
-  subtitles: 'hmhmhm hmhmhm doh',
-  marks: ['4:30', '5:40'],
-});
-
-playMedia({
-  name: 'name',
-  format: FormatsOfMedia.FLV,
-  type: TypesOfMedia.AUDIO,
-  marks: {},
-});
-playMedia({
-  name: 'subname',
-  format: FormatsOfMedia.FLV,
-  type: TypesOfMedia.AUDIO,
-  marks: 'hello',
-});
+function checkAnimalData(animal: Res): string | ISuccesData {
+  if (isAvalible(animal)) {
+    return animal.data;
+  } else {
+    return `${animal.data}, you can try in ${animal.data.nextUpdateIn}`;
+  }
+}
