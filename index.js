@@ -1,32 +1,41 @@
-var electricityUserData = {
-    readings: 95,
-    units: 'kWt',
-    mode: 'double'
+"use strict";
+const formData = {
+    email: '',
+    title: '',
+    text: '',
+    checkbox: false,
 };
-var waterUserData = {
-    readings: 3,
-    units: 'm3'
-};
-var elRate = 0.45;
-var wRate = 2;
-var monthPayments = [0, 0]; // [electricity, water]
-var calculatePayments = function (_a, _b, elRate, wRate) {
-    var mode = _a.mode, readings = _a.readings;
-    var wData = _b.readings;
-    if (mode === 'double' && readings < 50) {
-        monthPayments[0] = readings * elRate * 0.7;
+const formsListRef = document.querySelectorAll('form');
+const emailRef = document.querySelector('#email');
+const titleRef = document.querySelector('#title');
+const textRef = document.querySelector('#text');
+const checkboxRef = document.querySelector('#checkbox');
+function handleSubmit(e) {
+    e.preventDefault();
+    formData.email = emailRef?.value;
+    formData.title = titleRef?.value;
+    formData.text = textRef?.value;
+    formData.checkbox = checkboxRef.checked;
+    validateFormData(formData) && checkFormData(formData);
+}
+formsListRef.forEach((elem) => elem.addEventListener('submit', handleSubmit));
+function validateFormData(data) {
+    if (Object.values(data).every((value) => typeof value === 'string' ? value.trim() : value)) {
+        return true;
     }
     else {
-        monthPayments[0] = readings * elRate;
+        console.log('Please, complete all fields');
+        return false;
     }
-    monthPayments[1] = wData * wRate;
-};
-calculatePayments(electricityUserData, waterUserData, elRate, wRate);
-var sendInvoice = function (_a, _b, _c) {
-    var electricity = _a[0], water = _a[1];
-    var eReadings = _b.readings, eUnits = _b.units;
-    var wReadings = _c.readings, wUnits = _c.units;
-    var text = "    Hello!\n    This month you used ".concat(eReadings, " ").concat(eUnits, " of electricity\n    It will cost: ").concat(electricity, "\u20AC\n    \n    This month you used ").concat(wReadings, " ").concat(wUnits, " of water\n    It will cost: ").concat(water, "\u20AC");
-    return text;
-};
-console.log(sendInvoice(monthPayments, electricityUserData, waterUserData));
+}
+function checkFormData(data) {
+    const { email } = data;
+    const emails = ['example@gmail.com', 'example@ex.com', 'admin@gmail.com'];
+    const isInclude = emails.some(e => e === email);
+    if (isInclude) {
+        console.log('This email is already exist');
+    }
+    else {
+        console.log('Posting data...');
+    }
+}

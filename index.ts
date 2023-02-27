@@ -1,48 +1,59 @@
-type Animal = 'cat' | 'dog' | 'bird';
-
-enum Status {
-  Avalible = 'available',
-  NoAvalible = 'not available',
+interface IData {
+  email: string;
+  title: string;
+  text: string;
+  checkbox: boolean;
 }
 
-interface IAnimal {
-  animal: Animal;
-  breed: string;
-  sterilized?: boolean;
+const formData: IData = {
+  email: '',
+  title: '',
+  text: '',
+  checkbox: false,
+};
+
+const formsListRef = document.querySelectorAll('form');
+const emailRef = document.querySelector('#email') as HTMLInputElement;
+const titleRef = document.querySelector('#title') as HTMLInputElement;
+const textRef = document.querySelector('#text') as HTMLInputElement;
+const checkboxRef = document.querySelector('#checkbox') as HTMLInputElement;
+
+function handleSubmit(e: SubmitEvent): void {
+  e.preventDefault();
+
+  formData.email = emailRef?.value;
+  formData.title = titleRef?.value;
+  formData.text = textRef?.value;
+  formData.checkbox = checkboxRef.checked;
+
+  validateFormData(formData) && checkFormData(formData);
 }
 
-interface ISuccesData extends IAnimal {
-  location: string;
-  age?: number;
-}
+formsListRef.forEach((elem: HTMLFormElement) =>
+  elem.addEventListener('submit', handleSubmit)
+);
 
-interface ISuccesRes {
-  status: Status.Avalible;
-  data: ISuccesData;
-}
-
-interface IRejectRes {
-  status: Status.NoAvalible;
-  data: {
-    message: string;
-    nextUpdateIn: Date;
-  };
-}
-
-type Res = ISuccesRes | IRejectRes;
-
-function isAvalible(res: Res): res is ISuccesRes {
-  if (res.status === Status.Avalible) {
+function validateFormData(data: IData): boolean {
+  if (
+    Object.values(data).every((value: string | boolean) =>
+      typeof value === 'string' ? value.trim() : value
+    )
+  ) {
     return true;
   } else {
+    console.log('Please, complete all fields');
     return false;
   }
 }
 
-function checkAnimalData(animal: Res): string | ISuccesData {
-  if (isAvalible(animal)) {
-    return animal.data;
+function checkFormData(data: IData): void {
+  const { email } = data;
+  const emails = ['example@gmail.com', 'example@ex.com', 'admin@gmail.com'];
+
+  const isInclude = emails.some(e => e === email);
+  if (isInclude) {
+    console.log('This email is already exist');
   } else {
-    return `${animal.data}, you can try in ${animal.data.nextUpdateIn}`;
+    console.log('Posting data...');
   }
 }
