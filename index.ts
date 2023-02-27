@@ -25,7 +25,7 @@ function playMedia(
     format: FormatsOfMedia.MKV,
   }
 ): string {
-  let marksLog: unknown;
+  let marksLog: string;
   if (Array.isArray(marks)) {
     marksLog = marks.toString();
   } else if (typeof marks === 'string') {
