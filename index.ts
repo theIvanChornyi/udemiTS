@@ -1,115 +1,60 @@
-interface IPlayTime {
-  total: number;
-  inMenu: number;
+interface IPhone {
+  company: string;
+  number: number;
 }
 
-interface IPlayerData<
-  T extends string | number,
-  S extends IPlayTime | string | number
-> {
-  game: T;
-  hours: S;
-  server: string;
+interface IMobilePhone extends IPhone {
+  size: string;
+  companyPartner: IPhone['company'];
+  manufactured: Date;
 }
 
-const player1: IPlayerData<string, number> = {
-  game: 'CS:GO',
-  hours: 300,
-  server: 'basic',
-};
-
-const player2: IPlayerData<number, string> = {
-  game: 2048,
-  hours: '300 h.',
-  server: 'arcade',
-};
-
-const player3: IPlayerData<string, IPlayTime> = {
-  game: 'Chess',
-  hours: {
-    total: 500,
-    inMenu: 50,
-  },
-  server: 'chess',
-};
-
-interface AmountOfFigures {
-  squares: number;
-  circles: number;
-  triangles: number;
-  others: number;
-}
-
-enum FigureType {
-  SQUARE = 'rect',
-  CIRCLE = 'circle',
-  TRIANGLE = 'triangle',
-  LINE = 'line',
-}
-
-interface IFigure {
-  name: FigureType;
-}
-
-function calculateAmountOfFigures<T extends IFigure>(
-  figure: T[]
-): AmountOfFigures {
-  return figure.reduce(
-    (acc, item) => {
-      switch (item.name) {
-        case FigureType.SQUARE:
-          acc.squares += 1;
-          break;
-        case FigureType.CIRCLE:
-          acc.circles += 1;
-          break;
-        case FigureType.TRIANGLE:
-          acc.triangles += 1;
-          break;
-        case FigureType.LINE:
-          acc.others += 1;
-          break;
-        default:
-          return acc;
-      }
-      return acc;
-    },
-    { squares: 0, circles: 0, triangles: 0, others: 0 }
-  );
-}
-
-const data = [
+const phones: IMobilePhone[] = [
   {
-    name: FigureType.SQUARE,
-    data: { a: 5, b: 10 },
+    company: 'Nokia',
+    number: 1285637,
+    size: '5.5',
+    companyPartner: 'MobileNokia',
+    manufactured: new Date('2022-09-01'),
   },
   {
-    name: FigureType.SQUARE,
-    data: { a: 6, b: 11 },
+    company: 'Samsung',
+    number: 4356637,
+    size: '5.0',
+    companyPartner: 'SamMobile',
+    manufactured: new Date('2021-11-05'),
   },
   {
-    name: FigureType.TRIANGLE,
-    data: { a: 5, b: 10, c: 14 },
-  },
-  {
-    name: FigureType.LINE,
-    data: { l: 15 },
-  },
-  {
-    name: FigureType.CIRCLE,
-    data: { r: 10 },
-  },
-  {
-    name: FigureType.CIRCLE,
-    data: { r: 5 },
-  },
-  {
-    name: FigureType.SQUARE,
-    data: { a: 15, b: 7 },
-  },
-  {
-    name: FigureType.TRIANGLE,
+    company: 'Apple',
+    number: 4552833,
+    size: '5.7',
+    companyPartner: 'no data',
+    manufactured: new Date('2022-05-24T12:00:00'),
   },
 ];
 
-console.log(calculateAmountOfFigures(data));
+interface IPhonesManufacturedAfterDate extends IMobilePhone {
+  initialDate: string;
+}
+
+function filterPhonesByDate(
+  phones: IMobilePhone[],
+  key: keyof IMobilePhone,
+  initial: string
+): IPhonesManufacturedAfterDate[] {
+  const initialDate = new Date(initial);
+  const initialArr: IPhonesManufacturedAfterDate[] = [];
+
+  return phones.reduce((acc, phone) => {
+    if (phone[key] > initialDate) {
+      acc.push({ ...phone, initialDate: initial });
+    }
+    return acc;
+  }, initialArr);
+
+  // return phones
+  //   .filter(phone => phone[key] > new Date(initial))
+  //   .map(phone => ({ ...phone, initialDate: initial }));
+}
+
+console.log(filterPhonesByDate(phones, 'manufactured', '2022-01-01'));
