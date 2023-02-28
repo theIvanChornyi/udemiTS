@@ -1,59 +1,117 @@
-interface IData {
-  email: string;
-  title: string;
-  text: string;
-  checkbox: boolean;
+interface IPlayTime {
+  total: number;
+  inMenu: number;
 }
 
-const formData: IData = {
-  email: '',
-  title: '',
-  text: '',
-  checkbox: false,
+interface IPlayerData<
+  T extends string | number,
+  S extends IPlayTime | string | number
+> {
+  game: T;
+  hours: S;
+  server: string;
+}
+
+const player1: IPlayerData<string, number> = {
+  game: 'CS:GO',
+  hours: 300,
+  server: 'basic',
 };
 
-const formsListRef = document.querySelectorAll('form');
-const emailRef = document.querySelector('#email') as HTMLInputElement;
-const titleRef = document.querySelector('#title') as HTMLInputElement;
-const textRef = document.querySelector('#text') as HTMLInputElement;
-const checkboxRef = document.querySelector('#checkbox') as HTMLInputElement;
+const player2: IPlayerData<number, string> = {
+  game: 2048,
+  hours: '300 h.',
+  server: 'arcade',
+};
 
-function handleSubmit(e: SubmitEvent): void {
-  e.preventDefault();
+const player3: IPlayerData<string, IPlayTime> = {
+  game: 'Chess',
+  hours: {
+    total: 500,
+    inMenu: 50,
+  },
+  server: 'chess',
+};
 
-  formData.email = emailRef?.value;
-  formData.title = titleRef?.value;
-  formData.text = textRef?.value;
-  formData.checkbox = checkboxRef.checked;
-
-  validateFormData(formData) && checkFormData(formData);
+interface AmountOfFigures {
+  squares: number;
+  circles: number;
+  triangles: number;
+  others: number;
 }
 
-formsListRef.forEach((elem: HTMLFormElement) =>
-  elem.addEventListener('submit', handleSubmit)
-);
-
-function validateFormData(data: IData): boolean {
-  if (
-    Object.values(data).every((value: string | boolean) =>
-      typeof value === 'string' ? value.trim() : value
-    )
-  ) {
-    return true;
-  } else {
-    console.log('Please, complete all fields');
-    return false;
-  }
+enum FigureType {
+  SQUARE = 'rect',
+  CIRCLE = 'circle',
+  TRIANGLE = 'triangle',
+  LINE = 'line',
 }
 
-function checkFormData(data: IData): void {
-  const { email } = data;
-  const emails = ['example@gmail.com', 'example@ex.com', 'admin@gmail.com'];
-
-  const isInclude = emails.some(e => e === email);
-  if (isInclude) {
-    console.log('This email is already exist');
-  } else {
-    console.log('Posting data...');
-  }
+interface IFigure {
+  name: FigureType;
 }
+
+function calculateAmountOfFigures<T extends IFigure>(
+  figure: T[]
+): AmountOfFigures {
+  const response: AmountOfFigures = figure.reduce(
+    (acc, item) => {
+      switch (item.name) {
+        case FigureType.SQUARE:
+          acc.squares += 1;
+          break;
+        case FigureType.CIRCLE:
+          acc.circles += 1;
+          break;
+        case FigureType.TRIANGLE:
+          acc.triangles += 1;
+          break;
+        case FigureType.LINE:
+          acc.others += 1;
+          break;
+        default:
+          return acc;
+      }
+      return acc;
+    },
+    { squares: 0, circles: 0, triangles: 0, others: 0 }
+  );
+
+  return response;
+}
+
+const data = [
+  {
+    name: FigureType.SQUARE,
+    data: { a: 5, b: 10 },
+  },
+  {
+    name: FigureType.SQUARE,
+    data: { a: 6, b: 11 },
+  },
+  {
+    name: FigureType.TRIANGLE,
+    data: { a: 5, b: 10, c: 14 },
+  },
+  {
+    name: FigureType.LINE,
+    data: { l: 15 },
+  },
+  {
+    name: FigureType.CIRCLE,
+    data: { r: 10 },
+  },
+  {
+    name: FigureType.CIRCLE,
+    data: { r: 5 },
+  },
+  {
+    name: FigureType.SQUARE,
+    data: { a: 15, b: 7 },
+  },
+  {
+    name: FigureType.TRIANGLE,
+  },
+];
+
+console.log(calculateAmountOfFigures(data));
