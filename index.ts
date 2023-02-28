@@ -54,7 +54,7 @@ interface IFigure {
 function calculateAmountOfFigures<T extends IFigure>(
   figure: T[]
 ): AmountOfFigures {
-  const response: AmountOfFigures = figure.reduce(
+  return figure.reduce(
     (acc, item) => {
       switch (item.name) {
         case FigureType.SQUARE:
@@ -76,8 +76,6 @@ function calculateAmountOfFigures<T extends IFigure>(
     },
     { squares: 0, circles: 0, triangles: 0, others: 0 }
   );
-
-  return response;
 }
 
 const data = [
