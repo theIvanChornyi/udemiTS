@@ -1,60 +1,99 @@
-interface IPhone {
-  company: string;
-  number: number;
+interface IClasses {
+  name: string;
+  startsAt: string;
+  duration: number;
 }
 
-interface IMobilePhone extends IPhone {
-  size: string;
-  companyPartner: IPhone['company'];
-  manufactured: Date;
+interface IFutureClasses extends Omit<IClasses, 'startsAt'> {
+  willStartsAt: string;
 }
 
-const phones: IMobilePhone[] = [
-  {
-    company: 'Nokia',
-    number: 1285637,
-    size: '5.5',
-    companyPartner: 'MobileNokia',
-    manufactured: new Date('2022-09-01'),
-  },
-  {
-    company: 'Samsung',
-    number: 4356637,
-    size: '5.0',
-    companyPartner: 'SamMobile',
-    manufactured: new Date('2021-11-05'),
-  },
-  {
-    company: 'Apple',
-    number: 4552833,
-    size: '5.7',
-    companyPartner: 'no data',
-    manufactured: new Date('2022-05-24T12:00:00'),
-  },
-];
-
-interface IPhonesManufacturedAfterDate extends IMobilePhone {
-  initialDate: string;
+interface IClients {
+  name: string;
+  gender: 'male' | 'female';
+  age: '-' | number;
+  timeLeft: string;
 }
 
-function filterPhonesByDate(
-  phones: IMobilePhone[],
-  key: keyof IMobilePhone,
-  initial: string
-): IPhonesManufacturedAfterDate[] {
-  const initialDate = new Date(initial);
-  const initialArr: IPhonesManufacturedAfterDate[] = [];
+interface IExClientType extends Omit<IClients, 'timeLeft'> {
+  makeCallFor: Date;
+}
+interface IFutureClients extends Omit<IExClientType, 'gender' | 'age'> {}
 
-  return phones.reduce((acc, phone) => {
-    if (phone[key] > initialDate) {
-      acc.push({ ...phone, initialDate: initial });
-    }
-    return acc;
-  }, initialArr);
-
-  // return phones
-  //   .filter(phone => phone[key] > new Date(initial))
-  //   .map(phone => ({ ...phone, initialDate: initial }));
+interface IClubCenter {
+  clubName: string;
+  location: string;
+  classes: IClasses[];
+  futureClasses: IFutureClasses[];
+  currClients: IClients[];
+  exClients: IExClientType[];
+  futureClients: IFutureClients[];
 }
 
-console.log(filterPhonesByDate(phones, 'manufactured', '2022-01-01'));
+const fitnessClubCenter: IClubCenter = {
+  clubName: 'Fitness club Center',
+  location: 'central ave. 45, 5th floor',
+  classes: [
+    {
+      name: 'yoga',
+      startsAt: '8:00 AM',
+      duration: 60,
+    },
+    {
+      name: 'trx',
+      startsAt: '11:00 AM',
+      duration: 45,
+    },
+    {
+      name: 'swimming',
+      startsAt: '3:00 PM',
+      duration: 70,
+    },
+  ],
+  futureClasses: [
+    {
+      name: 'boxing',
+      willStartsAt: '6:00 PM',
+      duration: 40,
+    },
+    {
+      name: 'breath training',
+      willStartsAt: '8:00 PM',
+      duration: 30,
+    },
+  ],
+  currClients: [
+    {
+      name: 'John Smith',
+      age: '-',
+      gender: 'male',
+      timeLeft: '1 month',
+    },
+    {
+      name: 'Alise Smith',
+      age: 35,
+      gender: 'female',
+      timeLeft: '3 month',
+    },
+    {
+      name: 'Ann Sonne',
+      age: 24,
+      gender: 'female',
+      timeLeft: '5 month',
+    },
+  ],
+  exClients: [
+    {
+      name: 'Tom Smooth',
+      age: 50,
+      gender: 'male',
+      makeCallFor: new Date('2023-08-12'),
+    },
+  ],
+  futureClients: [
+    {
+      name: 'Maria',
+      makeCallFor: new Date('2023-07-10'),
+    },
+  ],
+};
