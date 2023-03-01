@@ -4,9 +4,7 @@ interface IForm {
 }
 
 type Validation<T> = {
-  [KEY in keyof T]:
-    | { isValid: boolean; errorMsg: string }
-    | { isValid: boolean };
+  [KEY in keyof T]: { isValid: false; errorMsg: string } | { isValid: true };
 };
 
 const validationData: Validation<IForm> = {

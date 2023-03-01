@@ -21,9 +21,10 @@ function createSlider({
 
 createSlider();
 
-type CustomSliderType = Required<Omit<ISlider, 'animationName' | 'speed'>> & {
+interface CustomSliderType
+  extends Required<Omit<ISlider, 'animationName' | 'speed'>> {
   speed: number;
-};
+}
 
 const customSliderOptions: CustomSliderType = {
   container: 'id',
