@@ -1,99 +1,65 @@
-interface IClasses {
-  name: string;
-  startsAt: string;
-  duration: number;
+enum TransferStatus {
+  Pending = 'pending',
+  Rejected = 'rejected',
+  Completed = 'completed',
 }
 
-interface IFutureClasses extends Omit<IClasses, 'startsAt'> {
-  willStartsAt: string;
+enum ErrorMessages {
+  NotFound = 'Not found: 404',
+  NotEnoughSpace = 'Not enough space: 507',
+  Forbidden = 'Forbidden: 403',
 }
 
-interface IClients {
-  name: string;
-  gender: 'male' | 'female';
-  age: '-' | number;
-  timeLeft: string;
+interface ITransfer {
+  path: string;
+  data: string[];
+  date?: Date;
+  start: (p: string, d: string[]) => string;
+  stop: (reason: string) => string;
 }
 
-interface IExClientType extends Omit<IClients, 'timeLeft'> {
-  makeCallFor: Date;
-}
-interface IFutureClients extends Omit<IExClientType, 'gender' | 'age'> {}
-
-interface IClubCenter {
-  clubName: string;
-  location: string;
-  classes: IClasses[];
-  futureClasses: IFutureClasses[];
-  currClients: IClients[];
-  exClients: IExClientType[];
-  futureClients: IFutureClients[];
+interface TransferError {
+  message: ErrorMessages;
 }
 
-const fitnessClubCenter: IClubCenter = {
-  clubName: 'Fitness club Center',
-  location: 'central ave. 45, 5th floor',
-  classes: [
-    {
-      name: 'yoga',
-      startsAt: '8:00 AM',
-      duration: 60,
-    },
-    {
-      name: 'trx',
-      startsAt: '11:00 AM',
-      duration: 45,
-    },
-    {
-      name: 'swimming',
-      startsAt: '3:00 PM',
-      duration: 70,
-    },
-  ],
-  futureClasses: [
-    {
-      name: 'boxing',
-      willStartsAt: '6:00 PM',
-      duration: 40,
-    },
-    {
-      name: 'breath training',
-      willStartsAt: '8:00 PM',
-      duration: 30,
-    },
-  ],
-  currClients: [
-    {
-      name: 'John Smith',
-      age: '-',
-      gender: 'male',
-      timeLeft: '1 month',
-    },
-    {
-      name: 'Alise Smith',
-      age: 35,
-      gender: 'female',
-      timeLeft: '3 month',
-    },
-    {
-      name: 'Ann Sonne',
-      age: 24,
-      gender: 'female',
-      timeLeft: '5 month',
-    },
-  ],
-  exClients: [
-    {
-      name: 'Tom Smooth',
-      age: 50,
-      gender: 'male',
-      makeCallFor: new Date('2023-08-12'),
-    },
-  ],
-  futureClients: [
-    {
-      name: 'Maria',
-      makeCallFor: new Date('2023-07-10'),
-    },
-  ],
-};
+class SingleFileTransfer implements ITransfer, TransferError {
+  path: string;
+  data: string[];
+  date?: Date | undefined;
+  message: ErrorMessages;
+  status: TransferStatus;
+  constructor(path: string, data: string[], date?: Date) {
+    this.path = path;
+    this.data = data;
+    this.date = date;
+    this.status = TransferStatus.Pending;
+  }
+  checkTransferStatus = (): string => {
+    return `Operation is ${this.status}`;
+  };
+
+  start = (p: string, d: string[]): string => {
+    if (d.length > 0) {
+      this.status = TransferStatus.Completed;
+      return `Your data saved od  server/${p}`;
+    } else {
+      this.status = TransferStatus.Rejected;
+      this.stop(ErrorMessages.NotFound);
+      return this.stop(ErrorMessages.NotFound);
+    }
+  };
+  stop = (reason: string): string => {
+    this.status = TransferStatus.Rejected;
+    return `Process stoped by ${reason} at ${new Date().toLocaleString()}`;
+  };
+
+  rejected = (error: ErrorMessages): string => {
+    return `Process crashed when it's ${this.status} with ${error}`;
+  };
+}
+const file = new SingleFileTransfer('./home', ['mama', 'papa'], new Date());
+
+console.log(file.checkTransferStatus());
+console.log(file.stop('boring'));
+console.log(file.rejected(ErrorMessages.NotFound));
+console.log(file.start('', []));
