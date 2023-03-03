@@ -1,65 +1,93 @@
-enum TransferStatus {
-  Pending = 'pending',
-  Rejected = 'rejected',
-  Completed = 'completed',
+interface Queue<T> {
+  enqueue(item: T): void; // поставить в очередь
+  dequeue(): T | undefined; // исключить из очереди
+  peek(): T | undefined | null; // посмотреть первый элемент
+  isEmpty(): boolean; // проверка на "пустоту" сущности
+  length(): number; // проверка на длину
 }
 
-enum ErrorMessages {
-  NotFound = 'Not found: 404',
-  NotEnoughSpace = 'Not enough space: 507',
-  Forbidden = 'Forbidden: 403',
-}
+class ArrayQueue<T> implements Queue<T> {
+  #queue: T[] = [];
 
-interface ITransfer {
-  path: string;
-  data: string[];
-  date?: Date;
-  start: (p: string, d: string[]) => string;
-  stop: (reason: string) => string;
-}
-
-interface TransferError {
-  message: ErrorMessages;
-}
-
-class SingleFileTransfer implements ITransfer, TransferError {
-  path: string;
-  data: string[];
-  date?: Date | undefined;
-  message: ErrorMessages;
-  status: TransferStatus;
-  constructor(path: string, data: string[], date?: Date) {
-    this.path = path;
-    this.data = data;
-    this.date = date;
-    this.status = TransferStatus.Pending;
+  enqueue(this: ArrayQueue<T>, item: T): void {
+    this.#queue.push(item);
   }
-  checkTransferStatus = (): string => {
-    return `Operation is ${this.status}`;
-  };
-
-  start = (p: string, d: string[]): string => {
-    if (d.length > 0) {
-      this.status = TransferStatus.Completed;
-      return `Your data saved od  server/${p}`;
-    } else {
-      this.status = TransferStatus.Rejected;
-      this.stop(ErrorMessages.NotFound);
-      return this.stop(ErrorMessages.NotFound);
-    }
-  };
-  stop = (reason: string): string => {
-    this.status = TransferStatus.Rejected;
-    return `Process stoped by ${reason} at ${new Date().toLocaleString()}`;
-  };
-
-  rejected = (error: ErrorMessages): string => {
-    return `Process crashed when it's ${this.status} with ${error}`;
-  };
+  dequeue(this: ArrayQueue<T>): T | undefined {
+    return this.#queue.shift();
+  }
+  peek(this: ArrayQueue<T>): T | null {
+    return this.isEmpty() ? null : this.#queue[0];
+  }
+  isEmpty(this: ArrayQueue<T>): boolean {
+    return this.#queue.length > 0 ? true : false;
+  }
+  length(this: ArrayQueue<T>): number {
+    return this.#queue.length;
+  }
 }
-const file = new SingleFileTransfer('./home', ['mama', 'papa'], new Date());
 
-console.log(file.checkTransferStatus());
-console.log(file.stop('boring'));
-console.log(file.rejected(ErrorMessages.NotFound));
-console.log(file.start('', []));
+class Stack<T> {
+  #stack: T[] = [];
+  #limit: number;
+
+  constructor(limit: number = Number.MAX_VALUE) {
+    this.#limit = limit;
+  }
+
+  push(this: Stack<T>, value: T): void {
+    if (this.length() >= this.#limit) {
+      throw new Error('Stack overflow!!!');
+    }
+    this.#stack.push(value);
+  }
+
+  pop(this: Stack<T>): T {
+    if (this.isEmpty()) {
+      throw new Error('Stack is empty!!!');
+    } else {
+      return this.#stack.pop() as T;
+    }
+  }
+
+  length(this: Stack<T>): number {
+    return this.#stack.length;
+  }
+
+  isEmpty(this: Stack<T>): boolean {
+    return this.#stack.length > 0 ? false : true;
+  }
+
+  top(this: Stack<T>): T | null {
+    return this.isEmpty() ? null : this.#stack[this.length() - 1];
+  }
+}
+
+// Для тестов
+
+const arrTest1 = new ArrayQueue<number>();
+arrTest1.enqueue(5);
+arrTest1.enqueue(10);
+console.log(arrTest1.peek());
+console.log(arrTest1.dequeue());
+console.log(arrTest1.length());
+
+const arrTest2 = new ArrayQueue<string>();
+arrTest2.enqueue('5');
+arrTest2.enqueue('10');
+console.log(arrTest2.peek());
+console.log(arrTest2.dequeue());
+console.log(arrTest2.length());
+
+const stackTest1 = new Stack<number>(10);
+stackTest1.push(20);
+stackTest1.push(50);
+console.log(stackTest1.top());
+console.log(stackTest1.pop());
+console.log(stackTest1.length());
+
+const stackTest2 = new Stack<string>(10);
+stackTest2.push('20');
+stackTest2.push('50');
+console.log(stackTest2.top());
+console.log(stackTest2.pop());
+console.log(stackTest2.length());
