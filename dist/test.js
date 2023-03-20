@@ -5,6 +5,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 const registerValidation = {};
 function Required(target, name) {
     registerValidation[target.constructor.name] = Object.assign(Object.assign({}, registerValidation[target.constructor.name]), { [name]: ['required'] });
@@ -39,10 +42,12 @@ class Citizen {
     }
 }
 __decorate([
-    Required
+    Required,
+    __metadata("design:type", String)
 ], Citizen.prototype, "name", void 0);
 __decorate([
-    PositiveNumber
+    PositiveNumber,
+    __metadata("design:type", Number)
 ], Citizen.prototype, "age", void 0);
 const citizen = new Citizen('Ivan', -28);
 if (!validation(citizen)) {
