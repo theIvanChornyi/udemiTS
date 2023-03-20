@@ -11,21 +11,44 @@ let Car = class Car {
         this.open = true;
         this.freeSeats = 3;
     }
-    get isOpen() {
+    isOpen() {
         return this.open ? 'Open' : 'Closed';
     }
 };
+__decorate([
+    checkFuel
+], Car.prototype, "isOpen", null);
 Car = __decorate([
-    closeCar
+    changeAmounOfFuel(30),
+    changeDorStatus(false)
 ], Car);
 const car = new Car();
-function closeCar(constructor) {
-    return class extends constructor {
-        constructor() {
-            super(...arguments);
-            this.open = false;
-        }
+function changeDorStatus(status) {
+    return (constructor) => {
+        return class extends constructor {
+            constructor() {
+                super(...arguments);
+                this.open = status;
+            }
+        };
     };
 }
-console.log(car.isOpen);
+function changeAmounOfFuel(amount) {
+    return (constructor) => {
+        return class extends constructor {
+            constructor() {
+                super(...arguments);
+                this.fuel = `${amount}%`;
+            }
+        };
+    };
+}
+function checkFuel(_, __, descriptor) {
+    const oldValue = descriptor.value;
+    descriptor.value = function (...args) {
+        console.log('Fuel', this.fuel);
+        return oldValue.apply(this, args);
+    };
+}
+console.log(car.isOpen());
 //# sourceMappingURL=decorators.js.map
